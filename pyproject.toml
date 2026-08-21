@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slice-ctx"
+version = "0.1.0"
+description = "A static-analysis-driven context compiler for LLM coding agents."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+exact-tokens = ["tiktoken"]
+
+[project.scripts]
+slice-ctx = "slice_ctx.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["slice_ctx*"]

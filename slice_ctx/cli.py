@@ -1,0 +1,136 @@
+"""
+cli.py — `python -m slice_ctx analyze ...`
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+
+from .parser import parse_repo
+from .graph import RepoGraph
+from .slicer import slice_for, render_slice
+from .session import Session
+from .tokens import count_tokens, METHOD
+
+
+def _naive_baseline(graph: RepoGraph, result) -> tuple[str, int]:
+    """What a naive tool sends: the *whole file* for every symbol in the
+    slice (this is what 'dump relevant files into the prompt' means in
+    practice), deduplicated by file."""
+    seen_files = {}
+    for sid in result.included:
+        sym = graph.symbols[sid]
+        if sym.file_path not in seen_files:
+            with open(sym.file_path, "r", encoding="utf-8") as f:
+                seen_files[sym.file_path] = f.read()
+    text = "\n".join(f"# --- {fp} ---\n{content}" for fp, content in seen_files.items())
+    return text, count_tokens(text)
+
+
+def cmd_analyze(args: argparse.Namespace) -> int:
+    modules, symbols = parse_repo(args.repo)
+    graph = RepoGraph(modules, symbols)
+
+    if args.target not in symbols:
+        print(f"error: symbol {args.target!r} not found.", file=sys.stderr)
+        candidates = [s for s in symbols if args.target.split(".")[-1] in s]
+        if candidates:
+            print("did you mean one of:", file=sys.stderr)
+            for c in sorted(candidates)[:10]:
+                print(f"  {c}", file=sys.stderr)
+        return 1
+
+    result = slice_for(graph, args.target, callee_depth=args.callee_depth, caller_depth=args.caller_depth)
+    rendered = render_slice(graph, result)
+
+    slice_tokens = count_tokens(rendered)
+    naive_text, naive_tokens = _naive_baseline(graph, result)
+
+    session_note = None
+    if args.session:
+        session = Session(args.session)
+        units = []
+        for sid in result.included:
+            sym = graph.symbols[sid]
+            unit = session.get_context_unit(sym.id, sym.source)
+            units.append(unit)
+        session.save()
+        session_tokens = sum(count_tokens(u.payload) for u in units)
+        session_note = {
+            "new": sum(1 for u in units if u.status == "new"),
+            "unchanged": sum(1 for u in units if u.status == "unchanged"),
+            "changed": sum(1 for u in units if u.status == "changed"),
+            "tokens_with_session_reuse": session_tokens,
+        }
+
+    report = {
+        "target": result.target,
+        "included_symbols": result.included,
+        "counts": {
+            "callees": len(result.callees),
+            "callers": len(result.callers),
+            "type_refs": len(result.type_refs),
+            "global_refs": len(result.global_refs),
+        },
+        "sound": result.sound,
+        "unsound_reasons": result.unsound_reasons,
+        "unresolved_calls": result.unresolved,
+        "tokens": {
+            "method": METHOD,
+            "slice": slice_tokens,
+            "naive_full_file_baseline": naive_tokens,
+            "reduction_pct": round(100 * (1 - slice_tokens / naive_tokens), 1) if naive_tokens else 0.0,
+        },
+        "session": session_note,
+    }
+
+    if args.json:
+        print(json.dumps(report, indent=2))
+    else:
+        print(rendered)
+        print("\n" + "=" * 72)
+        print(f"target: {result.target}")
+        print(f"sound: {result.sound}" + ("" if result.sound else "  (see --json for reasons)"))
+        print(f"included: {len(result.included)} symbols "
+              f"({len(result.callees)} callees, {len(result.callers)} callers, "
+              f"{len(result.type_refs)} types, {len(result.global_refs)} globals)")
+        print(f"tokens [{METHOD}]: slice={slice_tokens}  naive_full_file={naive_tokens}  "
+              f"reduction={report['tokens']['reduction_pct']}%")
+        if session_note:
+            print(f"session reuse: {session_note['new']} new, {session_note['unchanged']} unchanged, "
+                  f"{session_note['changed']} changed -> {session_note['tokens_with_session_reuse']} tokens "
+                  f"if this were a repeat turn")
+        if not result.sound:
+            print("\nWARNING: this slice is not certified sound. Fall back to full-file context for:")
+            for sid, reasons in result.unsound_reasons.items():
+                for r in reasons:
+                    print(f"  - {sid}: {r}")
+
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="slice_ctx", description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    p_analyze = sub.add_parser("analyze", help="compute a dependency slice for one symbol")
+    p_analyze.add_argument("repo", help="path to the repo root")
+    p_analyze.add_argument("--target", required=True,
+                            help="dotted symbol id, e.g. pkg.module.ClassName.method")
+    p_analyze.add_argument("--callee-depth", type=int, default=None,
+                            help="transitive callee depth (default: unlimited)")
+    p_analyze.add_argument("--caller-depth", type=int, default=1,
+                            help="transitive caller depth (default: 1, signature-only)")
+    p_analyze.add_argument("--session", default=None,
+                            help="path to a session cache file for diff-based reuse")
+    p_analyze.add_argument("--json", action="store_true", help="emit JSON report instead of text")
+    p_analyze.set_defaults(func=cmd_analyze)
+
+    args = parser.parse_args(argv)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
