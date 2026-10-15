@@ -15,6 +15,7 @@ import difflib
 import hashlib
 import json
 import os
+import tempfile
 from dataclasses import dataclass, asdict
 
 
@@ -42,8 +43,24 @@ class Session:
                 self._state = json.load(f)
 
     def save(self) -> None:
-        with open(self.path, "w", encoding="utf-8") as f:
-            json.dump(self._state, f, indent=2)
+        # Replace only after a complete write, so an interrupted/failed save
+        # never truncates the last successful session. Keep the temp file on
+        # the same filesystem for atomic os.replace semantics.
+        directory = os.path.dirname(os.path.abspath(self.path))
+        temp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w", encoding="utf-8", dir=directory,
+                prefix=".slice-session-", delete=False,
+            ) as f:
+                temp_path = f.name
+                json.dump(self._state, f, indent=2)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(temp_path, self.path)
+        finally:
+            if temp_path is not None and os.path.exists(temp_path):
+                os.unlink(temp_path)
 
     def get_context_unit(self, file_path: str, content: str) -> ContextUnit:
         h = _hash(content)
