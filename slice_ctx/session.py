@@ -39,8 +39,20 @@ class Session:
         self.path = path
         self._state: dict[str, dict] = {}
         if os.path.exists(path):
-            with open(path, "r", encoding="utf-8") as f:
-                self._state = json.load(f)
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    saved = json.load(f)
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                saved = {}
+            # A cache is expendable; corrupted entries must trigger full
+            # context instead of crashing or falsely suppressing changed code.
+            if isinstance(saved, dict):
+                for file_path, entry in saved.items():
+                    if not isinstance(entry, dict):
+                        continue
+                    content = entry.get("content")
+                    if isinstance(content, str) and entry.get("hash") == _hash(content):
+                        self._state[file_path] = {"hash": entry["hash"], "content": content}
 
     def save(self) -> None:
         # Replace only after a complete write, so an interrupted/failed save
