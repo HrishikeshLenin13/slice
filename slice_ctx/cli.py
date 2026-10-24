@@ -7,6 +7,8 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from contextlib import redirect_stdout
+from pathlib import Path
 
 from .parser import parse_repo
 from .graph import RepoGraph
@@ -126,9 +128,13 @@ def main(argv: list[str] | None = None) -> int:
     p_analyze.add_argument("--session", default=None,
                             help="path to a session cache file for diff-based reuse")
     p_analyze.add_argument("--json", action="store_true", help="emit JSON report instead of text")
+    p_analyze.add_argument("--output", help="write the report to a UTF-8 file instead of stdout")
     p_analyze.set_defaults(func=cmd_analyze)
 
     args = parser.parse_args(argv)
+    if args.output:
+        with Path(args.output).open("w", encoding="utf-8") as stream, redirect_stdout(stream):
+            return args.func(args)
     return args.func(args)
 
 

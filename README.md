@@ -48,6 +48,8 @@ Add `--session .slice_session.json` and re-run on a later turn: files whose
 content hasn't changed since last sent report `unchanged` and cost zero
 tokens; changed files send a unified diff instead of a full resend.
 
+Save a text or JSON report with `--output report.json --json`. The default remains stdout.
+
 ## How it works
 
 **1. Dependency-graph slicing, not embedding search** (`parser.py`,
