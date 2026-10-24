@@ -113,6 +113,13 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     return 0
 
 
+def non_negative_depth(value: str) -> int:
+    depth = int(value)
+    if depth < 0:
+        raise argparse.ArgumentTypeError("depth must be non-negative")
+    return depth
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="slice_ctx", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -121,9 +128,9 @@ def main(argv: list[str] | None = None) -> int:
     p_analyze.add_argument("repo", help="path to the repo root")
     p_analyze.add_argument("--target", required=True,
                             help="dotted symbol id, e.g. pkg.module.ClassName.method")
-    p_analyze.add_argument("--callee-depth", type=int, default=None,
+    p_analyze.add_argument("--callee-depth", type=non_negative_depth, default=None,
                             help="transitive callee depth (default: unlimited)")
-    p_analyze.add_argument("--caller-depth", type=int, default=1,
+    p_analyze.add_argument("--caller-depth", type=non_negative_depth, default=1,
                             help="transitive caller depth (default: 1, signature-only)")
     p_analyze.add_argument("--session", default=None,
                             help="path to a session cache file for diff-based reuse")
@@ -132,10 +139,16 @@ def main(argv: list[str] | None = None) -> int:
     p_analyze.set_defaults(func=cmd_analyze)
 
     args = parser.parse_args(argv)
-    if args.output:
-        with Path(args.output).open("w", encoding="utf-8") as stream, redirect_stdout(stream):
-            return args.func(args)
-    return args.func(args)
+    if not Path(args.repo).is_dir():
+        parser.error(f"repo is not a directory: {args.repo}")
+    try:
+        if args.output:
+            with Path(args.output).open("w", encoding="utf-8") as stream, redirect_stdout(stream):
+                return args.func(args)
+        return args.func(args)
+    except OSError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
