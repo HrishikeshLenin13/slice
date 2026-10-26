@@ -117,3 +117,6 @@ class CompletionContracts(unittest.TestCase):
     def test_032_negative_max_tokens_is_a_usage_error(self):
         with self.assertRaises(SystemExit) as error:self.analyze('--max-tokens','-1')
         self.assertEqual(error.exception.code,2)
+
+    def test_033_session_first_read_sends_complete_source(self):
+        s=Session(str(self.root/'session.json'));unit=s.get_context_unit('file','content');self.assertEqual((unit.status,unit.payload),('new','content'))
