@@ -94,3 +94,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_026_listing_offsets_do_not_change_total_match_count(self):
         args=['symbols',str(self.root),'--json'];all=json.loads(self.cli(args)[1]);page=json.loads(self.cli(args+['--offset','1','--limit','2'])[1]);self.assertEqual(page['total'],all['total']);self.assertEqual(page['symbols'],all['symbols'][1:3])
+
+    def test_027_listing_details_include_navigation_not_source(self):
+        _,text,_=self.cli(['symbols',str(self.root),'--details','--json']);item=json.loads(text)['symbols'][0];self.assertIn('line',item);self.assertNotIn('source',item)
