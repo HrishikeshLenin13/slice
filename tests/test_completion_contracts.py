@@ -28,3 +28,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_004_one_callee_level_includes_the_immediate_function(self):
         r=slice_for(self.graph,'demo.caller',callee_depth=1,caller_depth=0);self.assertIn('demo.target',r.included);self.assertNotIn('demo.leaf',r.included)
+
+    def test_005_zero_caller_depth_omits_callers(self):
+        r=slice_for(self.graph,'demo.target',caller_depth=0);self.assertNotIn('demo.caller',r.callers)
