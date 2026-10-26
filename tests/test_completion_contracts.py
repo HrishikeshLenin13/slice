@@ -91,3 +91,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_025_zero_listing_limits_report_available_continuation(self):
         _,text,_=self.cli(['symbols',str(self.root),'--limit','0','--json']);data=json.loads(text);self.assertEqual(data['returned'],0);self.assertTrue(data['has_more'])
+
+    def test_026_listing_offsets_do_not_change_total_match_count(self):
+        args=['symbols',str(self.root),'--json'];all=json.loads(self.cli(args)[1]);page=json.loads(self.cli(args+['--offset','1','--limit','2'])[1]);self.assertEqual(page['total'],all['total']);self.assertEqual(page['symbols'],all['symbols'][1:3])
