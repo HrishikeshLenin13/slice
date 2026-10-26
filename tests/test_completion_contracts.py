@@ -67,3 +67,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_017_strict_mode_keeps_unsound_reports_available(self):
         status,text,_=self.cli(['analyze',str(self.root),'--target','demo.dynamic','--strict','--json']);self.assertEqual(status,3);self.assertFalse(json.loads(text)['sound'])
+
+    def test_018_saved_json_matches_stdout_reports(self):
+        expected=json.loads(self.analyze()[1]);dest=self.root/'report.json';status,text,_=self.analyze('--output',str(dest));self.assertEqual((status,text),(0,''));self.assertEqual(json.loads(dest.read_text()),expected)
