@@ -14,3 +14,6 @@ class DiscoveryRound3(unittest.TestCase):
     def test_kind_filter_selects_only_matching_symbol_kinds(self):
         _,text=self.call(['symbols',str(self.root),'--kind','class','--json'])
         self.assertEqual(json.loads(text)['symbols'],['demo.Thing'])
+    def test_module_filter_respects_dotted_name_boundaries(self):
+        _,text=self.call(['symbols',str(self.root),'--module','demo','--json'])
+        ids=json.loads(text)['symbols'];self.assertTrue(ids);self.assertTrue(all(i.startswith('demo.') for i in ids));self.assertNotIn('demonstration.other',ids)
