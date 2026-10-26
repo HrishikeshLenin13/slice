@@ -79,3 +79,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_021_symbol_listing_is_sorted_and_deterministic(self):
         args=['symbols',str(self.root),'--json'];left=self.cli(args);self.assertEqual(left,self.cli(args));ids=json.loads(left[1])['symbols'];self.assertEqual(ids,sorted(ids))
+
+    def test_022_symbol_queries_are_case_insensitive(self):
+        status,text,_=self.cli(['symbols',str(self.root),'--query','TARGET','--json']);self.assertEqual(status,0);self.assertEqual(json.loads(text)['symbols'],['demo.target'])
