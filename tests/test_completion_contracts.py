@@ -135,3 +135,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_038_session_hash_mismatches_do_not_suppress_source(self):
         path=self.root/'session.json';path.write_text(json.dumps({'file':{'hash':'wrong','content':'text'}}));self.assertEqual(Session(str(path)).get_context_unit('file','text').status,'new')
+
+    def test_039_session_nonobject_records_are_ignored(self):
+        path=self.root/'session.json';path.write_text(json.dumps({'file':[]}));self.assertEqual(Session(str(path)).get_context_unit('file','text').status,'new')
