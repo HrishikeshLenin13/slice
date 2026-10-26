@@ -101,3 +101,7 @@ class CompletionContracts(unittest.TestCase):
     def test_028_details_without_json_is_a_usage_error(self):
         with self.assertRaises(SystemExit) as error:self.cli(['symbols',str(self.root),'--details'])
         self.assertEqual(error.exception.code,2)
+
+    def test_029_negative_caller_depth_is_a_usage_error(self):
+        with self.assertRaises(SystemExit) as error:self.analyze('--caller-depth','-1')
+        self.assertEqual(error.exception.code,2)
