@@ -58,3 +58,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_014_symbol_budgets_never_truncate_dependency_reports(self):
         status,text,_=self.analyze('--max-symbols','0');data=json.loads(text);self.assertEqual(status,4);self.assertTrue(data['included_symbols']);self.assertTrue(data['budget']['exceeded'])
+
+    def test_015_token_budgets_keep_the_complete_source_payload(self):
+        status,text,_=self.analyze('--max-tokens','0','--include-source');self.assertEqual(status,5);self.assertIn('def target',json.loads(text)['source'])
