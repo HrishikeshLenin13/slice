@@ -91,6 +91,9 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         "session": session_note,
     }
 
+    limit = getattr(args, "max_symbols", None)
+    exceeded = limit is not None and len(result.included) > limit
+    if limit is not None: report["budget"] = {"limit":limit,"included":len(result.included),"exceeded":exceeded}
     if getattr(args, "include_source", False):
         report["source"] = rendered
     if args.json:
@@ -115,7 +118,8 @@ def cmd_analyze(args: argparse.Namespace) -> int:
                 for r in reasons:
                     print(f"  - {sid}: {r}")
 
-    return 3 if getattr(args, "strict", False) and not result.sound else 0
+    if getattr(args, "strict", False) and not result.sound: return 3
+    return 4 if exceeded else 0
 
 
 def cmd_symbols(args: argparse.Namespace) -> int:
@@ -148,6 +152,7 @@ def main(argv: list[str] | None = None) -> int:
                             help="path to a session cache file for diff-based reuse")
     p_analyze.add_argument("--json", action="store_true", help="emit JSON report instead of text")
     p_analyze.add_argument("--output", help="write the report to a UTF-8 file instead of stdout")
+    p_analyze.add_argument("--max-symbols", type=non_negative_depth, help="exit 4 when a complete report exceeds this symbol budget")
     p_analyze.add_argument("--include-source", action="store_true", help="include rendered context in JSON reports")
     p_analyze.add_argument("--strict", action="store_true", help="exit 3 for an uncertified slice without hiding its report")
     p_analyze.set_defaults(func=cmd_analyze)
