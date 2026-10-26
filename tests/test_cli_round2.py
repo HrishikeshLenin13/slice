@@ -19,3 +19,7 @@ class CliExtensions(unittest.TestCase):
         (self.root/'demo.py').write_text('def target():\n    return eval("1")\n')
         code,text=self.call(['analyze',str(self.root),'--target','demo.target','--strict','--json'])
         self.assertEqual(code,3);self.assertFalse(json.loads(text)['sound'])
+
+    def test_json_can_include_rendered_context(self):
+        code,text=self.call(['analyze',str(self.root),'--target','demo.target','--json','--include-source'])
+        self.assertEqual(code,0);self.assertIn('def target',json.loads(text)['source'])

@@ -88,6 +88,8 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         "session": session_note,
     }
 
+    if getattr(args, "include_source", False):
+        report["source"] = rendered
     if args.json:
         print(json.dumps(report, indent=2))
     else:
@@ -143,6 +145,7 @@ def main(argv: list[str] | None = None) -> int:
                             help="path to a session cache file for diff-based reuse")
     p_analyze.add_argument("--json", action="store_true", help="emit JSON report instead of text")
     p_analyze.add_argument("--output", help="write the report to a UTF-8 file instead of stdout")
+    p_analyze.add_argument("--include-source", action="store_true", help="include rendered context in JSON reports")
     p_analyze.add_argument("--strict", action="store_true", help="exit 3 for an uncertified slice without hiding its report")
     p_analyze.set_defaults(func=cmd_analyze)
 
