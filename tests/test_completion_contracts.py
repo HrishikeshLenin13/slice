@@ -22,3 +22,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_002_unlimited_callee_depth_reaches_transitive_dependencies(self):
         r=slice_for(self.graph,'demo.caller');self.assertIn('demo.target',r.included);self.assertIn('demo.leaf',r.included)
+
+    def test_003_zero_callee_depth_does_not_include_called_functions(self):
+        r=slice_for(self.graph,'demo.target',callee_depth=0,caller_depth=0);self.assertNotIn('demo.leaf',r.included)
