@@ -43,3 +43,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_009_repeated_slicing_has_stable_member_order(self):
         self.assertEqual(slice_for(self.graph,'demo.target').included,slice_for(self.graph,'demo.target').included)
+
+    def test_010_rendering_does_not_mutate_graph_source(self):
+        r=slice_for(self.graph,'demo.target');before=self.graph.symbols['demo.target'].source;render_slice(self.graph,r);self.assertEqual(self.graph.symbols['demo.target'].source,before)
