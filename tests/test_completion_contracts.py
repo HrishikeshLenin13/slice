@@ -61,3 +61,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_015_token_budgets_keep_the_complete_source_payload(self):
         status,text,_=self.analyze('--max-tokens','0','--include-source');self.assertEqual(status,5);self.assertIn('def target',json.loads(text)['source'])
+
+    def test_016_symbol_budget_status_precedes_token_budget_status(self):
+        self.assertEqual(self.analyze('--max-symbols','0','--max-tokens','0')[0],4)
