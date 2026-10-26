@@ -123,3 +123,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_034_session_repeats_send_no_source_payload(self):
         s=Session(str(self.root/'session.json'));s.get_context_unit('file','content');unit=s.get_context_unit('file','content');self.assertEqual((unit.status,unit.payload),('unchanged',''))
+
+    def test_035_session_changes_send_unified_diffs(self):
+        s=Session(str(self.root/'session.json'));s.get_context_unit('file','old\n');unit=s.get_context_unit('file','new\n');self.assertEqual(unit.status,'changed');self.assertIn('-old',unit.payload);self.assertIn('+new',unit.payload)
