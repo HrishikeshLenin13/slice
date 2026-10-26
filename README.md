@@ -1,6 +1,6 @@
 # Slice
 
-**The first LLM context system that proves what it's leaving out, instead of guessing.**
+**Dependency-aware Python context slices with explicit static-analysis limits.**
 
 Every context-compression tool that exists today — RAG rerankers, embedding
 search, LLMLingua-style prompt compression, Cursor's own retrieval — treats
@@ -159,3 +159,9 @@ this space do; they compress and hope.
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Report files and input validation
+
+Use `--json --output report.json` to save a report rather than print it. Text output can also be saved with `--output report.txt`.
+
+Depth values must be non-negative integers. Missing repository directories are usage errors; filesystem write failures produce a concise error and a non-zero exit code. These checks do not replace the report's soundness diagnostics.
