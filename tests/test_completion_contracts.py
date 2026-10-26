@@ -141,3 +141,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_040_session_summaries_do_not_expose_source_content(self):
         s=Session(str(self.root/'s'));s.get_context_unit('file','private body');self.assertNotIn('private body',json.dumps(s.as_dict()))
+
+    def test_041_session_summaries_are_detached_from_internal_hashes(self):
+        s=Session(str(self.root/'s'));s.get_context_unit('file','text');data=s.as_dict();data['file']['hash']='wrong';self.assertNotEqual(s.as_dict()['file']['hash'],'wrong')
