@@ -17,3 +17,7 @@ class DiscoveryRound3(unittest.TestCase):
     def test_module_filter_respects_dotted_name_boundaries(self):
         _,text=self.call(['symbols',str(self.root),'--module','demo','--json'])
         ids=json.loads(text)['symbols'];self.assertTrue(ids);self.assertTrue(all(i.startswith('demo.') for i in ids));self.assertNotIn('demonstration.other',ids)
+    def test_paging_reports_full_match_count_without_ambiguous_truncation(self):
+        _,text=self.call(['symbols',str(self.root),'--limit','1','--offset','1','--json'])
+        data=json.loads(text);self.assertEqual(data['returned'],1);self.assertGreater(data['total'],1);self.assertEqual(data['offset'],1)
+        _,empty=self.call(['symbols',str(self.root),'--limit','0','--json']);self.assertEqual(json.loads(empty)['symbols'],[]);self.assertTrue(json.loads(empty)['has_more'])

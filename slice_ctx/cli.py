@@ -125,7 +125,13 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 def cmd_symbols(args: argparse.Namespace) -> int:
     _, symbols = parse_repo(args.repo)
     ids = sorted(sid for sid in symbols if args.query.casefold() in sid.casefold() and (not args.kind or symbols[sid].kind == args.kind) and (not args.module or symbols[sid].module == args.module or symbols[sid].module.startswith(args.module + ".")))
-    print(json.dumps({"symbols":ids,"total":len(ids)},indent=2) if args.json else "\n".join(ids))
+    total = len(ids)
+    selected = ids[args.offset:None if args.limit is None else args.offset + args.limit]
+    report = {"symbols":selected,"total":total}
+    if args.offset or args.limit is not None:
+        report.update(offset=args.offset, returned=len(selected), has_more=args.offset+len(selected)<total)
+        if not args.json and (args.offset or len(selected)<total): print(f"showing {len(selected)} of {total} symbols (offset {args.offset})",file=sys.stderr)
+    print(json.dumps(report,indent=2) if args.json else "\n".join(selected))
     return 0
 
 
@@ -163,6 +169,8 @@ def main(argv: list[str] | None = None) -> int:
     listing.add_argument("--module", help="exact module or dotted module subtree")
     listing.add_argument("--kind", choices=["function","class","method","global"])
     listing.add_argument("--json", action="store_true")
+    listing.add_argument("--limit",type=non_negative_depth)
+    listing.add_argument("--offset",type=non_negative_depth,default=0)
     listing.add_argument("--output")
     listing.set_defaults(func=cmd_symbols)
     args = parser.parse_args(argv)
