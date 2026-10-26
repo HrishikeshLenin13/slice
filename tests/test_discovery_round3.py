@@ -24,3 +24,6 @@ class DiscoveryRound3(unittest.TestCase):
     def test_details_exposes_navigation_locations_not_source_bodies(self):
         _,text=self.call(['symbols',str(self.root),'--kind','class','--details','--json']);item=json.loads(text)['symbols'][0]
         self.assertEqual(item['id'],'demo.Thing');self.assertEqual(item['kind'],'class');self.assertEqual(item['line'],1);self.assertNotIn('source',item)
+    def test_token_budget_returns_a_complete_nonzero_report(self):
+        status,text=self.call(['analyze',str(self.root),'--target','demo.target','--max-tokens','0','--json','--include-source'])
+        data=json.loads(text);self.assertEqual(status,5);self.assertTrue(data['token_budget']['exceeded']);self.assertIn('def target',data['source']);self.assertTrue(data['included_symbols'])

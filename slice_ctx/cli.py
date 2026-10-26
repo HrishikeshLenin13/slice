@@ -96,6 +96,9 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     if limit is not None: report["budget"] = {"limit":limit,"included":len(result.included),"exceeded":exceeded}
     if getattr(args, "include_source", False):
         report["source"] = rendered
+    token_limit = getattr(args,"max_tokens",None)
+    tokens_exceeded = token_limit is not None and slice_tokens > token_limit
+    if token_limit is not None: report["token_budget"]={"limit":token_limit,"included":slice_tokens,"method":METHOD,"exceeded":tokens_exceeded}
     if args.json:
         print(json.dumps(report, indent=2))
     else:
@@ -119,7 +122,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
                     print(f"  - {sid}: {r}")
 
     if getattr(args, "strict", False) and not result.sound: return 3
-    return 4 if exceeded else 0
+    return 4 if exceeded else 5 if tokens_exceeded else 0
 
 
 def cmd_symbols(args: argparse.Namespace) -> int:
@@ -159,6 +162,7 @@ def main(argv: list[str] | None = None) -> int:
                             help="path to a session cache file for diff-based reuse")
     p_analyze.add_argument("--json", action="store_true", help="emit JSON report instead of text")
     p_analyze.add_argument("--output", help="write the report to a UTF-8 file instead of stdout")
+    p_analyze.add_argument("--max-tokens",type=non_negative_depth,help="exit 5 when rendered context exceeds this token budget; never truncate")
     p_analyze.add_argument("--max-symbols", type=non_negative_depth, help="exit 4 when a complete report exceeds this symbol budget")
     p_analyze.add_argument("--include-source", action="store_true", help="include rendered context in JSON reports")
     p_analyze.add_argument("--strict", action="store_true", help="exit 3 for an uncertified slice without hiding its report")

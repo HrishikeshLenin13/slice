@@ -32,3 +32,7 @@ Run from the repository root:
 python3 -m unittest discover -s tests -v
 ```
 
+
+## Discovery and context budgets
+
+`symbols` accepts `--kind`, `--module`, `--limit`, `--offset`, and `--details --json`. Paging reports full match counts and continuation metadata. Details contain navigation locations, not source text. `analyze --max-tokens N` writes the complete report and exits 5 if rendered context exceeds the reported tokenizer/heuristic budget. Soundness (3) and symbol limits (4) take precedence. No dependency context is silently truncated.
