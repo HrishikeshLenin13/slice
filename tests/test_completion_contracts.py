@@ -150,3 +150,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_043_session_save_creates_no_leftover_temporary_files(self):
         s=Session(str(self.root/'session.json'));s.get_context_unit('f','text');s.save();self.assertEqual(list(self.root.glob('.slice-session-*')),[])
+
+    def test_044_session_unicode_source_survives_disk_round_trips(self):
+        path=str(self.root/'session.json');s=Session(path);s.get_context_unit('café','π = 3');s.save();self.assertEqual(Session(path).get_context_unit('café','π = 3').status,'unchanged')
