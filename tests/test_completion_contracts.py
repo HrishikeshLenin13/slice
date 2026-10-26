@@ -147,3 +147,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_042_different_symbol_ids_do_not_share_session_entries(self):
         s=Session(str(self.root/'s'));s.get_context_unit('a','same');self.assertEqual(s.get_context_unit('b','same').status,'new')
+
+    def test_043_session_save_creates_no_leftover_temporary_files(self):
+        s=Session(str(self.root/'session.json'));s.get_context_unit('f','text');s.save();self.assertEqual(list(self.root.glob('.slice-session-*')),[])
