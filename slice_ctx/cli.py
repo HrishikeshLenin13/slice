@@ -113,6 +113,13 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_symbols(args: argparse.Namespace) -> int:
+    _, symbols = parse_repo(args.repo)
+    ids = sorted(sid for sid in symbols if args.query.casefold() in sid.casefold())
+    print(json.dumps({"symbols":ids,"total":len(ids)},indent=2) if args.json else "\n".join(ids))
+    return 0
+
+
 def non_negative_depth(value: str) -> int:
     depth = int(value)
     if depth < 0:
@@ -138,6 +145,12 @@ def main(argv: list[str] | None = None) -> int:
     p_analyze.add_argument("--output", help="write the report to a UTF-8 file instead of stdout")
     p_analyze.set_defaults(func=cmd_analyze)
 
+    listing = sub.add_parser("symbols", help="list known symbol IDs before choosing a target")
+    listing.add_argument("repo")
+    listing.add_argument("--query", default="")
+    listing.add_argument("--json", action="store_true")
+    listing.add_argument("--output")
+    listing.set_defaults(func=cmd_symbols)
     args = parser.parse_args(argv)
     if not Path(args.repo).is_dir():
         parser.error(f"repo is not a directory: {args.repo}")
