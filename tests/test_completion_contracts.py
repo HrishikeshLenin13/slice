@@ -76,3 +76,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_020_failed_output_paths_return_concise_errors(self):
         status,_,err=self.analyze('--output',str(self.root/'missing'/'out'));self.assertEqual(status,1);self.assertNotIn('Traceback',err)
+
+    def test_021_symbol_listing_is_sorted_and_deterministic(self):
+        args=['symbols',str(self.root),'--json'];left=self.cli(args);self.assertEqual(left,self.cli(args));ids=json.loads(left[1])['symbols'];self.assertEqual(ids,sorted(ids))
