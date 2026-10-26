@@ -144,3 +144,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_041_session_summaries_are_detached_from_internal_hashes(self):
         s=Session(str(self.root/'s'));s.get_context_unit('file','text');data=s.as_dict();data['file']['hash']='wrong';self.assertNotEqual(s.as_dict()['file']['hash'],'wrong')
+
+    def test_042_different_symbol_ids_do_not_share_session_entries(self):
+        s=Session(str(self.root/'s'));s.get_context_unit('a','same');self.assertEqual(s.get_context_unit('b','same').status,'new')
