@@ -37,3 +37,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_007_global_reads_are_preserved_with_selected_functions(self):
         r=slice_for(self.graph,'demo.leaf',caller_depth=0);self.assertIn('demo.VALUE',r.included)
+
+    def test_008_unknown_targets_fail_before_rendering(self):
+        with self.assertRaises(KeyError):slice_for(self.graph,'missing')
