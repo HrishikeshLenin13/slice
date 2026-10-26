@@ -126,3 +126,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_035_session_changes_send_unified_diffs(self):
         s=Session(str(self.root/'session.json'));s.get_context_unit('file','old\n');unit=s.get_context_unit('file','new\n');self.assertEqual(unit.status,'changed');self.assertIn('-old',unit.payload);self.assertIn('+new',unit.payload)
+
+    def test_036_session_state_survives_save_and_reload(self):
+        path=str(self.root/'session.json');s=Session(path);s.get_context_unit('file','text');s.save();self.assertEqual(Session(path).get_context_unit('file','text').status,'unchanged')
