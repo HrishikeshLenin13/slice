@@ -113,3 +113,7 @@ class CompletionContracts(unittest.TestCase):
     def test_031_negative_max_symbols_is_a_usage_error(self):
         with self.assertRaises(SystemExit) as error:self.analyze('--max-symbols','-1')
         self.assertEqual(error.exception.code,2)
+
+    def test_032_negative_max_tokens_is_a_usage_error(self):
+        with self.assertRaises(SystemExit) as error:self.analyze('--max-tokens','-1')
+        self.assertEqual(error.exception.code,2)
