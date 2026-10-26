@@ -70,3 +70,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_018_saved_json_matches_stdout_reports(self):
         expected=json.loads(self.analyze()[1]);dest=self.root/'report.json';status,text,_=self.analyze('--output',str(dest));self.assertEqual((status,text),(0,''));self.assertEqual(json.loads(dest.read_text()),expected)
+
+    def test_019_missing_targets_preserve_existing_output_files(self):
+        dest=self.root/'report';dest.write_text('original');status,_,_=self.cli(['analyze',str(self.root),'--target','missing','--output',str(dest)]);self.assertEqual(status,1);self.assertEqual(dest.read_text(),'original')
