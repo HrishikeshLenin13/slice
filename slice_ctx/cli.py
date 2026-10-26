@@ -124,7 +124,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 
 def cmd_symbols(args: argparse.Namespace) -> int:
     _, symbols = parse_repo(args.repo)
-    ids = sorted(sid for sid in symbols if args.query.casefold() in sid.casefold())
+    ids = sorted(sid for sid in symbols if args.query.casefold() in sid.casefold() and (not args.kind or symbols[sid].kind == args.kind))
     print(json.dumps({"symbols":ids,"total":len(ids)},indent=2) if args.json else "\n".join(ids))
     return 0
 
@@ -160,6 +160,7 @@ def main(argv: list[str] | None = None) -> int:
     listing = sub.add_parser("symbols", help="list known symbol IDs before choosing a target")
     listing.add_argument("repo")
     listing.add_argument("--query", default="")
+    listing.add_argument("--kind", choices=["function","class","method","global"])
     listing.add_argument("--json", action="store_true")
     listing.add_argument("--output")
     listing.set_defaults(func=cmd_symbols)
