@@ -31,3 +31,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_005_zero_caller_depth_omits_callers(self):
         r=slice_for(self.graph,'demo.target',caller_depth=0);self.assertNotIn('demo.caller',r.callers)
+
+    def test_006_caller_context_includes_reverse_dependencies(self):
+        r=slice_for(self.graph,'demo.target');self.assertIn('demo.caller',r.callers)
