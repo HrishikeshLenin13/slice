@@ -49,3 +49,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_011_dynamic_eval_is_not_certified_sound(self):
         r=slice_for(self.graph,'demo.dynamic');self.assertFalse(r.sound);self.assertTrue(r.unsound_reasons)
+
+    def test_012_json_analysis_exposes_soundness_and_token_method(self):
+        status,text,_=self.analyze();data=json.loads(text);self.assertEqual(status,0);self.assertIn('method',data['tokens']);self.assertIn('sound',data)
