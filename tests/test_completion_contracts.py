@@ -85,3 +85,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_023_symbol_kinds_can_isolate_classes(self):
         _,text,_=self.cli(['symbols',str(self.root),'--kind','class','--json']);self.assertEqual(json.loads(text)['symbols'],['demo.Box'])
+
+    def test_024_module_filters_use_qualified_module_names(self):
+        _,text,_=self.cli(['symbols',str(self.root),'--module','absent','--json']);self.assertEqual(json.loads(text)['total'],0)
