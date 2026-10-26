@@ -88,3 +88,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_024_module_filters_use_qualified_module_names(self):
         _,text,_=self.cli(['symbols',str(self.root),'--module','absent','--json']);self.assertEqual(json.loads(text)['total'],0)
+
+    def test_025_zero_listing_limits_report_available_continuation(self):
+        _,text,_=self.cli(['symbols',str(self.root),'--limit','0','--json']);data=json.loads(text);self.assertEqual(data['returned'],0);self.assertTrue(data['has_more'])
