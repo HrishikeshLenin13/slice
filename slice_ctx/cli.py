@@ -110,7 +110,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
                 for r in reasons:
                     print(f"  - {sid}: {r}")
 
-    return 0
+    return 3 if getattr(args, "strict", False) and not result.sound else 0
 
 
 def cmd_symbols(args: argparse.Namespace) -> int:
@@ -143,6 +143,7 @@ def main(argv: list[str] | None = None) -> int:
                             help="path to a session cache file for diff-based reuse")
     p_analyze.add_argument("--json", action="store_true", help="emit JSON report instead of text")
     p_analyze.add_argument("--output", help="write the report to a UTF-8 file instead of stdout")
+    p_analyze.add_argument("--strict", action="store_true", help="exit 3 for an uncertified slice without hiding its report")
     p_analyze.set_defaults(func=cmd_analyze)
 
     listing = sub.add_parser("symbols", help="list known symbol IDs before choosing a target")
