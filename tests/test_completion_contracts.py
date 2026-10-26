@@ -19,3 +19,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_001_target_is_always_present_in_the_slice(self):
         r=slice_for(self.graph,'demo.target');self.assertIn('demo.target',r.included);self.assertEqual(r.included[0],'demo.target')
+
+    def test_002_unlimited_callee_depth_reaches_transitive_dependencies(self):
+        r=slice_for(self.graph,'demo.caller');self.assertIn('demo.target',r.included);self.assertIn('demo.leaf',r.included)
