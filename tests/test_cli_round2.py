@@ -23,3 +23,8 @@ class CliExtensions(unittest.TestCase):
     def test_json_can_include_rendered_context(self):
         code,text=self.call(['analyze',str(self.root),'--target','demo.target','--json','--include-source'])
         self.assertEqual(code,0);self.assertIn('def target',json.loads(text)['source'])
+
+    def test_unknown_target_preserves_previous_report(self):
+        output=self.root/'report.json';output.write_text('previous')
+        with contextlib.redirect_stderr(io.StringIO()):code,_=self.call(['analyze',str(self.root),'--target','missing','--output',str(output)])
+        self.assertEqual(code,1);self.assertEqual(output.read_text(),'previous')

@@ -7,6 +7,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import io
+import os
+import tempfile
 from contextlib import redirect_stdout
 from pathlib import Path
 
@@ -160,10 +163,20 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(f"repo is not a directory: {args.repo}")
     try:
         if args.output:
-            with Path(args.output).open("w", encoding="utf-8") as stream, redirect_stdout(stream):
-                return args.func(args)
+            output = io.StringIO()
+            with redirect_stdout(output): status = args.func(args)
+            if status == 1: return status
+            destination = Path(args.output)
+            temporary = None
+            try:
+                with tempfile.NamedTemporaryFile(mode="w",encoding="utf-8",dir=destination.parent,delete=False) as stream:
+                    temporary = Path(stream.name);stream.write(output.getvalue())
+                os.replace(temporary,destination)
+            finally:
+                if temporary and temporary.exists(): temporary.unlink()
+            return status
         return args.func(args)
-    except OSError as error:
+    except (OSError, UnicodeError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
 
