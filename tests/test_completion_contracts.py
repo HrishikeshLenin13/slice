@@ -138,3 +138,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_039_session_nonobject_records_are_ignored(self):
         path=self.root/'session.json';path.write_text(json.dumps({'file':[]}));self.assertEqual(Session(str(path)).get_context_unit('file','text').status,'new')
+
+    def test_040_session_summaries_do_not_expose_source_content(self):
+        s=Session(str(self.root/'s'));s.get_context_unit('file','private body');self.assertNotIn('private body',json.dumps(s.as_dict()))
