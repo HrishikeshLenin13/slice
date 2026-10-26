@@ -129,3 +129,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_036_session_state_survives_save_and_reload(self):
         path=str(self.root/'session.json');s=Session(path);s.get_context_unit('file','text');s.save();self.assertEqual(Session(path).get_context_unit('file','text').status,'unchanged')
+
+    def test_037_corrupt_session_json_recovers_as_new_context(self):
+        path=self.root/'session.json';path.write_text('{');self.assertEqual(Session(str(path)).get_context_unit('file','text').status,'new')
