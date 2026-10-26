@@ -82,3 +82,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_022_symbol_queries_are_case_insensitive(self):
         status,text,_=self.cli(['symbols',str(self.root),'--query','TARGET','--json']);self.assertEqual(status,0);self.assertEqual(json.loads(text)['symbols'],['demo.target'])
+
+    def test_023_symbol_kinds_can_isolate_classes(self):
+        _,text,_=self.cli(['symbols',str(self.root),'--kind','class','--json']);self.assertEqual(json.loads(text)['symbols'],['demo.Box'])
