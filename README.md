@@ -165,3 +165,7 @@ MIT — see [LICENSE](LICENSE).
 Use `--json --output report.json` to save a report rather than print it. Text output can also be saved with `--output report.txt`.
 
 Depth values must be non-negative integers. Missing repository directories are usage errors; filesystem write failures produce a concise error and a non-zero exit code. These checks do not replace the report's soundness diagnostics.
+
+## Developer resources
+
+- [Feature usage and API contracts](docs/RECENT_IMPROVEMENTS.md)
