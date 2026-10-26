@@ -97,3 +97,7 @@ class CompletionContracts(unittest.TestCase):
 
     def test_027_listing_details_include_navigation_not_source(self):
         _,text,_=self.cli(['symbols',str(self.root),'--details','--json']);item=json.loads(text)['symbols'][0];self.assertIn('line',item);self.assertNotIn('source',item)
+
+    def test_028_details_without_json_is_a_usage_error(self):
+        with self.assertRaises(SystemExit) as error:self.cli(['symbols',str(self.root),'--details'])
+        self.assertEqual(error.exception.code,2)
