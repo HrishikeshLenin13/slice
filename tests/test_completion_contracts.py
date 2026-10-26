@@ -120,3 +120,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_033_session_first_read_sends_complete_source(self):
         s=Session(str(self.root/'session.json'));unit=s.get_context_unit('file','content');self.assertEqual((unit.status,unit.payload),('new','content'))
+
+    def test_034_session_repeats_send_no_source_payload(self):
+        s=Session(str(self.root/'session.json'));s.get_context_unit('file','content');unit=s.get_context_unit('file','content');self.assertEqual((unit.status,unit.payload),('unchanged',''))
