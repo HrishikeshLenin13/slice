@@ -21,3 +21,6 @@ class DiscoveryRound3(unittest.TestCase):
         _,text=self.call(['symbols',str(self.root),'--limit','1','--offset','1','--json'])
         data=json.loads(text);self.assertEqual(data['returned'],1);self.assertGreater(data['total'],1);self.assertEqual(data['offset'],1)
         _,empty=self.call(['symbols',str(self.root),'--limit','0','--json']);self.assertEqual(json.loads(empty)['symbols'],[]);self.assertTrue(json.loads(empty)['has_more'])
+    def test_details_exposes_navigation_locations_not_source_bodies(self):
+        _,text=self.call(['symbols',str(self.root),'--kind','class','--details','--json']);item=json.loads(text)['symbols'][0]
+        self.assertEqual(item['id'],'demo.Thing');self.assertEqual(item['kind'],'class');self.assertEqual(item['line'],1);self.assertNotIn('source',item)
