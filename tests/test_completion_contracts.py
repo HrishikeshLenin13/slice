@@ -105,3 +105,7 @@ class CompletionContracts(unittest.TestCase):
     def test_029_negative_caller_depth_is_a_usage_error(self):
         with self.assertRaises(SystemExit) as error:self.analyze('--caller-depth','-1')
         self.assertEqual(error.exception.code,2)
+
+    def test_030_negative_callee_depth_is_a_usage_error(self):
+        with self.assertRaises(SystemExit) as error:self.analyze('--callee-depth','-1')
+        self.assertEqual(error.exception.code,2)
