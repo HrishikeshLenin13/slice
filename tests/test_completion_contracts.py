@@ -153,3 +153,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_044_session_unicode_source_survives_disk_round_trips(self):
         path=str(self.root/'session.json');s=Session(path);s.get_context_unit('café','π = 3');s.save();self.assertEqual(Session(path).get_context_unit('café','π = 3').status,'unchanged')
+
+    def test_045_empty_source_is_a_real_session_value(self):
+        s=Session(str(self.root/'session'));self.assertEqual(s.get_context_unit('f','').status,'new');self.assertEqual(s.get_context_unit('f','').status,'unchanged')
