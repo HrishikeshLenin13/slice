@@ -34,3 +34,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_006_caller_context_includes_reverse_dependencies(self):
         r=slice_for(self.graph,'demo.target');self.assertIn('demo.caller',r.callers)
+
+    def test_007_global_reads_are_preserved_with_selected_functions(self):
+        r=slice_for(self.graph,'demo.leaf',caller_depth=0);self.assertIn('demo.VALUE',r.included)
