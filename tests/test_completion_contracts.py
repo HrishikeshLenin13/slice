@@ -52,3 +52,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_012_json_analysis_exposes_soundness_and_token_method(self):
         status,text,_=self.analyze();data=json.loads(text);self.assertEqual(status,0);self.assertIn('method',data['tokens']);self.assertIn('sound',data)
+
+    def test_013_json_source_is_opt_in(self):
+        self.assertNotIn('source',json.loads(self.analyze()[1]));self.assertIn('def target',json.loads(self.analyze('--include-source')[1])['source'])
