@@ -73,3 +73,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_019_missing_targets_preserve_existing_output_files(self):
         dest=self.root/'report';dest.write_text('original');status,_,_=self.cli(['analyze',str(self.root),'--target','missing','--output',str(dest)]);self.assertEqual(status,1);self.assertEqual(dest.read_text(),'original')
+
+    def test_020_failed_output_paths_return_concise_errors(self):
+        status,_,err=self.analyze('--output',str(self.root/'missing'/'out'));self.assertEqual(status,1);self.assertNotIn('Traceback',err)
