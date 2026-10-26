@@ -132,3 +132,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_037_corrupt_session_json_recovers_as_new_context(self):
         path=self.root/'session.json';path.write_text('{');self.assertEqual(Session(str(path)).get_context_unit('file','text').status,'new')
+
+    def test_038_session_hash_mismatches_do_not_suppress_source(self):
+        path=self.root/'session.json';path.write_text(json.dumps({'file':{'hash':'wrong','content':'text'}}));self.assertEqual(Session(str(path)).get_context_unit('file','text').status,'new')
