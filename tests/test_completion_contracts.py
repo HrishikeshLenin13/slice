@@ -64,3 +64,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_016_symbol_budget_status_precedes_token_budget_status(self):
         self.assertEqual(self.analyze('--max-symbols','0','--max-tokens','0')[0],4)
+
+    def test_017_strict_mode_keeps_unsound_reports_available(self):
+        status,text,_=self.cli(['analyze',str(self.root),'--target','demo.dynamic','--strict','--json']);self.assertEqual(status,3);self.assertFalse(json.loads(text)['sound'])
