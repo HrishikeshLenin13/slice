@@ -55,3 +55,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_013_json_source_is_opt_in(self):
         self.assertNotIn('source',json.loads(self.analyze()[1]));self.assertIn('def target',json.loads(self.analyze('--include-source')[1])['source'])
+
+    def test_014_symbol_budgets_never_truncate_dependency_reports(self):
+        status,text,_=self.analyze('--max-symbols','0');data=json.loads(text);self.assertEqual(status,4);self.assertTrue(data['included_symbols']);self.assertTrue(data['budget']['exceeded'])
