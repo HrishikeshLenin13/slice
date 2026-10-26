@@ -40,3 +40,6 @@ class CompletionContracts(unittest.TestCase):
 
     def test_008_unknown_targets_fail_before_rendering(self):
         with self.assertRaises(KeyError):slice_for(self.graph,'missing')
+
+    def test_009_repeated_slicing_has_stable_member_order(self):
+        self.assertEqual(slice_for(self.graph,'demo.target').included,slice_for(self.graph,'demo.target').included)
