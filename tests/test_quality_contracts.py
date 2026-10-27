@@ -125,3 +125,12 @@ class QualityContracts(unittest.TestCase):
             self.assertTrue(symbol.source.strip())
             self.assertGreaterEqual(symbol.end_lineno,symbol.lineno)
             self.assertEqual(symbol.module,'demo')
+
+    def test_014_ast_shape_chained(self):
+        modules,symbols=self.parse('A=B=1\n')
+        self.assertEqual({s.qualname:s.kind for s in symbols.values()},{'A': 'global', 'B': 'global'})
+        self.assertEqual(set(modules),{'demo'})
+        for symbol in symbols.values():
+            self.assertTrue(symbol.source.strip())
+            self.assertGreaterEqual(symbol.end_lineno,symbol.lineno)
+            self.assertEqual(symbol.module,'demo')
