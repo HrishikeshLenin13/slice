@@ -344,3 +344,9 @@ class QualityContracts(unittest.TestCase):
         self.assertIn('日本',modules['demo'].source)
         self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
         self.assertIn('MESSAGE',symbols['demo.target'].source)
+
+    def test_042_source_encoding_gb18030(self):
+        modules,symbols=self.parse("# coding: gb18030\nMESSAGE='数学'\ndef target(): return MESSAGE\n",'gb18030')
+        self.assertIn('数学',modules['demo'].source)
+        self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
+        self.assertIn('MESSAGE',symbols['demo.target'].source)
