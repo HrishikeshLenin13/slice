@@ -543,3 +543,8 @@ class QualityContracts(unittest.TestCase):
         with self.assertRaises(SyntaxError):self.parse('class C( : pass')
         modules,symbols=self.parse('def recovered(): return 1\n')
         self.assertEqual(set(symbols),{'demo.recovered'})
+
+    def test_075_syntax_failure_15(self):
+        with self.assertRaises(SyntaxError):self.parse('x = "unterminated')
+        modules,symbols=self.parse('def recovered(): return 1\n')
+        self.assertEqual(set(symbols),{'demo.recovered'})
