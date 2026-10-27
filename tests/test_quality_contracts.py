@@ -260,3 +260,12 @@ class QualityContracts(unittest.TestCase):
             self.assertTrue(symbol.source.strip())
             self.assertGreaterEqual(symbol.end_lineno,symbol.lineno)
             self.assertEqual(symbol.module,'demo')
+
+    def test_029_ast_shape_unicode_function(self):
+        modules,symbols=self.parse('def café(): return 1\n')
+        self.assertEqual({s.qualname:s.kind for s in symbols.values()},{'café': 'function'})
+        self.assertEqual(set(modules),{'demo'})
+        for symbol in symbols.values():
+            self.assertTrue(symbol.source.strip())
+            self.assertGreaterEqual(symbol.end_lineno,symbol.lineno)
+            self.assertEqual(symbol.module,'demo')
