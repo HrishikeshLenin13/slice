@@ -523,3 +523,8 @@ class QualityContracts(unittest.TestCase):
         with self.assertRaises(SyntaxError):self.parse('import')
         modules,symbols=self.parse('def recovered(): return 1\n')
         self.assertEqual(set(symbols),{'demo.recovered'})
+
+    def test_071_syntax_failure_11(self):
+        with self.assertRaises(SyntaxError):self.parse('from import x')
+        modules,symbols=self.parse('def recovered(): return 1\n')
+        self.assertEqual(set(symbols),{'demo.recovered'})
