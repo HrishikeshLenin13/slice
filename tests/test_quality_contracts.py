@@ -308,3 +308,9 @@ class QualityContracts(unittest.TestCase):
         self.assertIn('€',modules['demo'].source)
         self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
         self.assertIn('MESSAGE',symbols['demo.target'].source)
+
+    def test_036_source_encoding_ascii(self):
+        modules,symbols=self.parse("# coding: ascii\nMESSAGE='plain'\ndef target(): return MESSAGE\n",'ascii')
+        self.assertIn('plain',modules['demo'].source)
+        self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
+        self.assertIn('MESSAGE',symbols['demo.target'].source)
