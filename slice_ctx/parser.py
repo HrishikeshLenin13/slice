@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import ast
 import os
+import tokenize
 from dataclasses import dataclass, field
 
 
@@ -86,7 +87,7 @@ def discover_py_files(repo_root: str) -> list[str]:
 
 
 def parse_module(repo_root: str, file_path: str) -> tuple[ModuleInfo, dict[str, Symbol]]:
-    with open(file_path, "r", encoding="utf-8") as f:
+    with tokenize.open(file_path) as f:
         source = f.read()
     tree = ast.parse(source, filename=file_path)
     module = _module_name_for(repo_root, file_path)
