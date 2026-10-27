@@ -338,3 +338,9 @@ class QualityContracts(unittest.TestCase):
         self.assertIn('άλφα',modules['demo'].source)
         self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
         self.assertIn('MESSAGE',symbols['demo.target'].source)
+
+    def test_041_source_encoding_shift_jis(self):
+        modules,symbols=self.parse("# coding: shift_jis\nMESSAGE='日本'\ndef target(): return MESSAGE\n",'shift_jis')
+        self.assertIn('日本',modules['demo'].source)
+        self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
+        self.assertIn('MESSAGE',symbols['demo.target'].source)
