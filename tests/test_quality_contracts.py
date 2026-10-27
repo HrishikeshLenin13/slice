@@ -445,3 +445,10 @@ class QualityContracts(unittest.TestCase):
         modules,symbols=self.parse('def target():return 1\n')
         self.assertEqual(set(modules),{'demo'})
         self.assertEqual(set(symbols),{'demo.target'})
+
+    def test_057_discovery_prunes_12(self):
+        path=self.root/'deep/.slice';path.mkdir(parents=True)
+        (path/'invalid.py').write_text('def broken(')
+        modules,symbols=self.parse('def target():return 1\n')
+        self.assertEqual(set(modules),{'demo'})
+        self.assertEqual(set(symbols),{'demo.target'})
