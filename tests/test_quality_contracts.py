@@ -362,3 +362,9 @@ class QualityContracts(unittest.TestCase):
         self.assertIn('č',modules['demo'].source)
         self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
         self.assertIn('MESSAGE',symbols['demo.target'].source)
+
+    def test_045_source_encoding_iso8859_9(self):
+        modules,symbols=self.parse("# coding: iso8859-9\nMESSAGE='İ'\ndef target(): return MESSAGE\n",'iso8859-9')
+        self.assertIn('İ',modules['demo'].source)
+        self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
+        self.assertIn('MESSAGE',symbols['demo.target'].source)
