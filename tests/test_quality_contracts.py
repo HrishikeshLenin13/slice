@@ -143,3 +143,12 @@ class QualityContracts(unittest.TestCase):
             self.assertTrue(symbol.source.strip())
             self.assertGreaterEqual(symbol.end_lineno,symbol.lineno)
             self.assertEqual(symbol.module,'demo')
+
+    def test_016_ast_shape_two_functions(self):
+        modules,symbols=self.parse('def a(): pass\ndef b(): pass\n')
+        self.assertEqual({s.qualname:s.kind for s in symbols.values()},{'a': 'function', 'b': 'function'})
+        self.assertEqual(set(modules),{'demo'})
+        for symbol in symbols.values():
+            self.assertTrue(symbol.source.strip())
+            self.assertGreaterEqual(symbol.end_lineno,symbol.lineno)
+            self.assertEqual(symbol.module,'demo')
