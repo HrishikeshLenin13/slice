@@ -278,3 +278,9 @@ class QualityContracts(unittest.TestCase):
             self.assertTrue(symbol.source.strip())
             self.assertGreaterEqual(symbol.end_lineno,symbol.lineno)
             self.assertEqual(symbol.module,'demo')
+
+    def test_031_source_encoding_utf_8(self):
+        modules,symbols=self.parse("# coding: utf-8\nMESSAGE='café'\ndef target(): return MESSAGE\n",'utf-8')
+        self.assertIn('café',modules['demo'].source)
+        self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
+        self.assertIn('MESSAGE',symbols['demo.target'].source)
