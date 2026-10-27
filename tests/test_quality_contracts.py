@@ -290,3 +290,9 @@ class QualityContracts(unittest.TestCase):
         self.assertIn('café',modules['demo'].source)
         self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
         self.assertIn('MESSAGE',symbols['demo.target'].source)
+
+    def test_033_source_encoding_latin_1(self):
+        modules,symbols=self.parse("# coding: latin-1\nMESSAGE='café'\ndef target(): return MESSAGE\n",'latin-1')
+        self.assertIn('café',modules['demo'].source)
+        self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
+        self.assertIn('MESSAGE',symbols['demo.target'].source)
