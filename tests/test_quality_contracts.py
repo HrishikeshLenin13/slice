@@ -368,3 +368,10 @@ class QualityContracts(unittest.TestCase):
         self.assertIn('İ',modules['demo'].source)
         self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
         self.assertIn('MESSAGE',symbols['demo.target'].source)
+
+    def test_046_discovery_prunes_1(self):
+        path=self.root/'.git';path.mkdir(parents=True)
+        (path/'invalid.py').write_text('def broken(')
+        modules,symbols=self.parse('def target():return 1\n')
+        self.assertEqual(set(modules),{'demo'})
+        self.assertEqual(set(symbols),{'demo.target'})
