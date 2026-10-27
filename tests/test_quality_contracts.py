@@ -326,3 +326,9 @@ class QualityContracts(unittest.TestCase):
         self.assertIn('Привет',modules['demo'].source)
         self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
         self.assertIn('MESSAGE',symbols['demo.target'].source)
+
+    def test_039_source_encoding_koi8_r(self):
+        modules,symbols=self.parse("# coding: koi8-r\nMESSAGE='Привет'\ndef target(): return MESSAGE\n",'koi8-r')
+        self.assertIn('Привет',modules['demo'].source)
+        self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
+        self.assertIn('MESSAGE',symbols['demo.target'].source)
