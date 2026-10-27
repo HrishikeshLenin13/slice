@@ -26,3 +26,12 @@ class QualityContracts(unittest.TestCase):
             self.assertTrue(symbol.source.strip())
             self.assertGreaterEqual(symbol.end_lineno,symbol.lineno)
             self.assertEqual(symbol.module,'demo')
+
+    def test_003_ast_shape_async(self):
+        modules,symbols=self.parse('async def target(): return 1\n')
+        self.assertEqual({s.qualname:s.kind for s in symbols.values()},{'target': 'function'})
+        self.assertEqual(set(modules),{'demo'})
+        for symbol in symbols.values():
+            self.assertTrue(symbol.source.strip())
+            self.assertGreaterEqual(symbol.end_lineno,symbol.lineno)
+            self.assertEqual(symbol.module,'demo')
