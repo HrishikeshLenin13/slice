@@ -356,3 +356,9 @@ class QualityContracts(unittest.TestCase):
         self.assertIn('中文',modules['demo'].source)
         self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
         self.assertIn('MESSAGE',symbols['demo.target'].source)
+
+    def test_044_source_encoding_cp1250(self):
+        modules,symbols=self.parse("# coding: cp1250\nMESSAGE='č'\ndef target(): return MESSAGE\n",'cp1250')
+        self.assertIn('č',modules['demo'].source)
+        self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
+        self.assertIn('MESSAGE',symbols['demo.target'].source)
