@@ -350,3 +350,9 @@ class QualityContracts(unittest.TestCase):
         self.assertIn('数学',modules['demo'].source)
         self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
         self.assertIn('MESSAGE',symbols['demo.target'].source)
+
+    def test_043_source_encoding_big5(self):
+        modules,symbols=self.parse("# coding: big5\nMESSAGE='中文'\ndef target(): return MESSAGE\n",'big5')
+        self.assertIn('中文',modules['demo'].source)
+        self.assertEqual(set(symbols),{'demo.MESSAGE','demo.target'})
+        self.assertIn('MESSAGE',symbols['demo.target'].source)
