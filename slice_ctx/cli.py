@@ -28,8 +28,8 @@ def _naive_baseline(graph: RepoGraph, result) -> tuple[str, int]:
     for sid in result.included:
         sym = graph.symbols[sid]
         if sym.file_path not in seen_files:
-            with open(sym.file_path, "r", encoding="utf-8") as f:
-                seen_files[sym.file_path] = f.read()
+            # The parser already decoded coding cookies/BOMs; reuse that exact snapshot.
+            seen_files[sym.file_path] = graph.modules[sym.module].source
     text = "\n".join(f"# --- {fp} ---\n{content}" for fp, content in seen_files.items())
     return text, count_tokens(text)
 
