@@ -53,6 +53,17 @@ class ModuleInfo:
     star_imports: list[str] = field(default_factory=list)  # modules star-imported (unresolvable)
 
 
+def imported_module_name(module, file_path, node):
+    """Resolve a relative import inside the repository's known package hierarchy."""
+    if not node.level:
+        return node.module
+    package=module.split('.') if os.path.basename(file_path)=='__init__.py' else module.split('.')[:-1]
+    if node.level>len(package):
+        return None
+    prefix=package[:len(package)-node.level+1]
+    return '.'.join(prefix+([node.module] if node.module else []))
+
+
 def assignment_names(target):
     """Extract only bound names, not attributes/subscripts, from unpacking targets."""
     if isinstance(target, ast.Name):
@@ -114,14 +125,14 @@ def parse_module(repo_root: str, file_path: str) -> tuple[ModuleInfo, dict[str, 
                 local = alias.asname or alias.name.split(".")[0]
                 mod_info.import_map[local] = alias.name
         elif isinstance(node, ast.ImportFrom):
-            if node.module is None:
+            if (target_module := imported_module_name(module, file_path, node)) is None:
                 continue
             if any(a.name == "*" for a in node.names):
-                mod_info.star_imports.append(node.module)
+                mod_info.star_imports.append(target_module)
                 continue
             for alias in node.names:
                 local = alias.asname or alias.name
-                mod_info.import_map[local] = f"{node.module}.{alias.name}"
+                mod_info.import_map[local] = f"{target_module}.{alias.name}"
 
     # --- module-level functions & classes & globals ---
     for node in tree.body:
