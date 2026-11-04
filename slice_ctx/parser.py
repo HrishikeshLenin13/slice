@@ -53,6 +53,17 @@ class ModuleInfo:
     star_imports: list[str] = field(default_factory=list)  # modules star-imported (unresolvable)
 
 
+def assignment_names(target):
+    """Extract only bound names, not attributes/subscripts, from unpacking targets."""
+    if isinstance(target, ast.Name):
+        yield target.id
+    elif isinstance(target, ast.Starred):
+        yield from assignment_names(target.value)
+    elif isinstance(target, (ast.Tuple, ast.List)):
+        for item in target.elts:
+            yield from assignment_names(item)
+
+
 def _module_name_for(root: str, file_path: str) -> str:
     rel = os.path.relpath(file_path, root)
     if rel.endswith("__init__.py"):
@@ -140,11 +151,11 @@ def parse_module(repo_root: str, file_path: str) -> tuple[ModuleInfo, dict[str, 
         elif isinstance(node, (ast.Assign, ast.AnnAssign)):
             targets = node.targets if isinstance(node, ast.Assign) else [node.target]
             for t in targets:
-                if isinstance(t, ast.Name):
-                    sid = f"{module}.{t.id}"
+                for binding_name in assignment_names(t):
+                    sid = f"{module}.{binding_name}"
                     symbols[sid] = Symbol(
                         id=sid, kind="global", module=module, file_path=file_path,
-                        qualname=t.id, lineno=node.lineno, end_lineno=node.end_lineno,
+                        qualname=binding_name, lineno=node.lineno, end_lineno=node.end_lineno,
                         source=_get_source_segment(lines, node), node=node,
                     )
 
