@@ -164,7 +164,7 @@ MIT — see [LICENSE](LICENSE).
 
 Use `--json --output report.json` to save a report rather than print it. Text output can also be saved with `--output report.txt`.
 
-Depth values must be non-negative integers. Missing repository directories are usage errors; filesystem write failures produce a concise error and a non-zero exit code. These checks do not replace the report's soundness diagnostics.
+Depth values must be non-negative integers. Missing repository directories are usage errors; filesystem write failures and invalid Python source produce a concise error and a non-zero exit code. Syntax errors include the source location; an existing report is preserved instead of replacing it with a partial result. These checks do not replace the report's soundness diagnostics.
 
 ## Developer resources
 

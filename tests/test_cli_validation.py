@@ -25,3 +25,21 @@ class ValidationTests(unittest.TestCase):
             self.assertEqual(code, 1)
             self.assertIn('error:', errors.getvalue())
             self.assertNotIn('Traceback', errors.getvalue())
+
+
+    def test_syntax_error_reports_location_without_writing_partial_report(self):
+        with tempfile.TemporaryDirectory() as root:
+            source = Path(root) / 'broken.py'
+            source.write_text("pass\nvalue =\n", encoding='utf-8')
+            report = Path(root) / 'report.json'
+            report.write_text('previous report', encoding='utf-8')
+            for args in (['symbols', root], ['analyze', root, '--target', 'broken.value']):
+                with self.subTest(command=args[0]):
+                    output, errors = io.StringIO(), io.StringIO()
+                    with contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
+                        code = main([*args, '--json', '--output', str(report)])
+                    self.assertEqual(code, 1)
+                    self.assertEqual(output.getvalue(), '')
+                    self.assertIn(f'error: {source}:2:', errors.getvalue())
+                    self.assertNotIn('Traceback', errors.getvalue())
+                    self.assertEqual(report.read_text(encoding='utf-8'), 'previous report')

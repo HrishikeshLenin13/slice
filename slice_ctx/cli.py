@@ -198,6 +198,10 @@ def main(argv: list[str] | None = None) -> int:
                 if temporary and temporary.exists(): temporary.unlink()
             return status
         return args.func(args)
+    except SyntaxError as error:
+        location = f"{error.filename}:{error.lineno}" if error.filename else "input"
+        print(f"error: {location}: {error.msg}", file=sys.stderr)
+        return 1
     except (OSError, UnicodeError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
